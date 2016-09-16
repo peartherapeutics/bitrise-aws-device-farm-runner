@@ -1,0 +1,93 @@
+title: "Amazon S3 Bucket Sync"
+summary: "Amazon S3 Bucket Sync"
+description: |-
+  Syncs the given local folder with an S3 bucket.
+
+  This Step requires an Amazon S3 registration.
+  To register an Amazon S3 account, [click here](http://aws.amazon.com/s3/).
+
+  # Warning!
+
+  It will perform a one-direction sync, removing every file and folder from
+  the bucket which is not present in the local, input folder!
+website: https://github.com/bitrise-io/steps-amazon-s3-upload
+source_code_url: https://github.com/bitrise-io/steps-amazon-s3-upload
+support_url: https://github.com/bitrise-io/steps-amazon-s3-upload/issues
+host_os_tags:
+  - osx-10.9
+  - osx-10.10
+project_type_tags: []
+type_tags:
+  - deploy
+  - upload
+  - uploader
+  - amazon
+is_requires_admin_user: false
+is_always_run: false
+is_skippable: false
+deps:
+  brew:
+  - name: awscli
+  apt_get:
+  - name: awscli
+run_if: ""
+inputs:
+  - access_key_id: ""
+    opts:
+      title: "AWS Access Key"
+      summary: ""
+      description: ""
+      is_required: true
+  - secret_access_key: ""
+    opts:
+      title: "AWS Secret Key"
+      summary: ""
+      description: ""
+      is_required: true
+  - upload_bucket: ""
+    opts:
+      title: "S3 Bucket Name"
+      summary: ""
+      description: ""
+      is_required: true
+  - upload_local_path: ""
+    opts:
+      title: "Local path to upload"
+      summary: ""
+      description: |
+        If you want to sync only the content of
+        the folder but don't want to create the folder then you
+        should append a slash at the end of the path. Example: ./folder/
+      is_required: true
+  - acl_control: "private"
+    opts:
+      title: "Access Control"
+      summary: ""
+      description: ""
+      value_options:
+      - "public-read"
+      - "private"
+      is_required: true
+  - set_acl_only_on_changed_objets: "true"
+    opts:
+      title: "Set ACL only on changed objects?"
+      summary: |-
+        If set to "true" it'll only set ACL for changed objects, which is
+        way faster to do than to check and set every objects' ACL.
+
+        Generally, you can keep this option on "yes" to get a speed boost,
+        and you should only change it to "false" if you changed the
+        ACL option (in order to force set every object's ACL to the specified one).
+      description: ""
+      value_options:
+        - "true"
+        - "false"
+      is_required: true
+  - aws_region: ""
+    opts:
+      title: "AWS Region"
+      summary: ""
+      description: |
+        If you want to specify a different AWS region of the bucket. Leave
+        empty to use the default config/env setting.
+outputs: []

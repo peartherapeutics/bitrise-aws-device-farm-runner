@@ -18,6 +18,11 @@ workflows:
         inputs:
         - access_key_id: $AWS_ACCESS_KEY
         - secret_access_key: $AWS_SECRET_KEY
+        - device_farm_project: ""
+        - test_package_name: "test_bundle.zip"
+        - test_type: "APPIUM_PYTHON"
+        - ios_pool: ""
+        - run_name_prefix: "testscript"
         - upload_bucket: $BUCKET_NAME
         - upload_local_path: _tmp/
         - acl_control: public-read

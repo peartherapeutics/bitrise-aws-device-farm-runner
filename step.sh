@@ -92,6 +92,11 @@ if [[ -n "$secret_access_key" ]] ; then
 else
 	echo_details "* secret_access_key: [EMPTY]"
 fi
+echo_details "* device_farm_project: $device_farm_project"
+echo_details "* test_package_name: $test_package_name"
+echo_details "* test_type: $test_type"
+echo_details "* ios_pool: $ios_pool"
+echo_details "* run_name_prefix: $run_name_prefix"
 echo_details "* upload_bucket: $upload_bucket"
 echo_details "* upload_local_path: $upload_local_path"
 echo_details "* acl_control: $acl_control"
@@ -101,8 +106,46 @@ echo
 
 validate_required_input "access_key_id" $access_key_id
 validate_required_input "secret_access_key" $secret_access_key
-validate_required_input "upload_bucket" $upload_bucket
-validate_required_input "upload_local_path" $upload_local_path
+validate_required_input "device_farm_project" $device_farm_project
+validate_required_input "test_package_name" $test_package_name
+validate_required_input "test_type" $test_type
+validate_required_input "ios_pool" $ios_pool
+#validate_required_input "upload_bucket" $upload_bucket
+#validate_required_input "upload_local_path" $upload_local_path
+
+####### Set up device farm run ##########
+set -o nounset
+set -o errexit
+set -o pipefail
+
+# Get most recent test bundle ARN
+test_package_arn=$(aws devicefarm list-uploads --arn="$device_farm_project" --query="uploads[?name=='${test_package_name}'] | max_by(@, &created).arn" --no-paginate | sed 's/\"//g')
+
+echo_details "Got test bundle ARN:'${test_package_arn}'"
+
+#TODO upload app bundle and get ARN from that
+app_arn='HARDCODE APP ARN HERE'
+
+#TODO get these from bitrise env
+platform='ios'
+bitrise_build_number='0'
+device_pool="$ios_pool"
+
+run_params=(--project-arn="$device_farm_project")
+run_params+=(--device-pool-arn="$device_pool")
+run_params+=(--app-arn="$app_arn")
+run_params+=(--test="{\"type\": \"${test_type}\",\"testPackageArn\": \"${test_package_arn}\",\"parameters\": {\"TestEnvVar\": \"foo\"}}")
+run_params+=(--query='run.arn')
+
+if [ ! -n "${run_name_prefix}" ]; then
+    run_params+=(--name="${run_name_prefix}_${platform}_${bitrise_build_number}")
+fi
+run_arn=$(aws devicefarm schedule-run "${run_params[@]}" | sed 's/\"//g')
+echo "Got run ARN:'${run_arn}'"
+
+exit 0
+
+####### S3 UPLOAD CODE: #######
 
 options=("public-read"  "private")
 validate_required_input_with_options "acl_control" $acl_control "${options[@]}"

@@ -44,6 +44,37 @@ inputs:
       summary: ""
       description: ""
       is_required: true
+  - device_farm_project: ""
+    opts:
+      title: "Device Farm Project ARN"
+      summary: ""
+      description: ""
+      is_required: true
+  - test_package_name: ""
+    opts:
+      title: "Test Package Filename"
+      summary: ""
+      description: "Filename of test package to run, the latest package with this name will be used."
+      is_required: true
+  - test_type: ""
+    opts:
+      title: "Test Type"
+      summary: ""
+      description: "See http://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Test.html#devicefarm-Type-Test-type"
+      is_required: true
+  - ios_pool: ""
+    opts:
+      title: "Device Farm iOS Device Pool ARN"
+      summary: ""
+      description: ""
+      is_required: true
+  - run_name_prefix: ""
+    opts:
+      title: "Run Name Prefix"
+      summary: ""
+      description: |
+        If you want to specify a name, this prefix will be used
+        followed by platform and bitrise build number.
   - upload_bucket: ""
     opts:
       title: "S3 Bucket Name"

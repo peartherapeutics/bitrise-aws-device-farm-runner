@@ -21,14 +21,10 @@ workflows:
         - device_farm_project: ""
         - test_package_name: "test_bundle.zip"
         - test_type: "APPIUM_PYTHON"
+        - platform: "ios"
         - ios_pool: ""
         - run_name_prefix: "testscript"
-        - upload_bucket: $BUCKET_NAME
-        - upload_local_path: _tmp/
-        - acl_control: public-read
-        # - acl_control: private
-        - set_acl_only_on_changed_objets: "true"
-        - aws_region: $BUCKET_REGION
+        - aws_region: ""
 
   # ----------------------------------------------------------------
   # --- workflow to Release with auto version bump

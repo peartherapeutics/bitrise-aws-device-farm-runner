@@ -48,6 +48,14 @@ function echo_done {
 	color_echo "${GREEN}" "  ${msg}"
 }
 
+function validate_required_variable {
+	key=$1
+	value=$2
+	if [ -z "${value}" ] ; then
+		echo_fail "[!] Variable: ${key} cannot be empty."
+	fi
+}
+
 function validate_required_input {
 	key=$1
 	value=$2
@@ -75,6 +83,85 @@ function validate_required_input_with_options {
 	fi
 }
 
+function validate_ios_inputs {
+    validate_required_input "ios_pool" $ios_pool
+    validate_required_input "ipa_path" $ipa_path
+}
+
+function validate_android_inputs {
+    echo_fail 'android is not yet supported'
+}
+
+function get_test_package_arn {
+    # Get most recent test bundle ARN
+    test_package_arn=$(aws devicefarm list-uploads --arn="$device_farm_project" --query="uploads[?name=='${test_package_name}'] | max_by(@, &created).arn" --no-paginate --output=text)
+    #test_package_arn=''
+
+    echo_details "Got test package ARN:'${test_package_arn}'"
+}
+
+function get_upload_status {
+    local upload_arn="$1"
+    validate_required_variable "upload_arn" $upload_arn
+
+    local upload_status=$(aws devicefarm get-upload --arn="$upload_arn" --query='upload.status' --output=text)
+    echo "$upload_status"
+}
+
+function device_farm_run {
+    echo_info "Setting up device farm run for platform '$platform'."
+    local device_pool="$1"
+    local app_package_path="$2"
+    local upload_type="$3"
+
+    validate_required_input "test_package_arn" $test_package_arn
+    validate_required_variable "device_pool" $device_pool
+    validate_required_variable "app_package_path" $app_package_path
+    validate_required_variable "upload_type" $upload_type
+
+    # Intialize upload
+    local app_filename=$(basename "$app_package_path")
+    local create_upload_response=$(aws devicefarm create-upload --project-arn="$device_farm_project" --name="$app_filename" --type="$upload_type" --query='upload.[arn, url]' --output=text)
+    local app_arn=$(echo $create_upload_response|cut -d' ' -f1)
+    local app_upload_url=$(echo $create_upload_response|cut -d' ' -f2)
+    echo_details "Initialized upload of package '$app_filename' for app ARN '$app_arn'"
+
+    # Perform upload
+    echo_details "Beginning upload"
+    curl -T "$app_package_path" "$app_upload_url"
+    echo_details "Upload finished. Polling for status."
+
+    # Poll for successful upload
+    local upload_status=$(get_upload_status "$app_arn")
+    echo_details "Upload status: $upload_status"
+    while [ ! "$upload_status" == 'SUCCEEDED' ]; do
+        if [ "$upload_status" == 'FAILED' ]; then
+            echo_fail 'Upload failed!'
+        fi
+
+        echo_details "Upload not yet processed; waiting. (Status=$upload_status)"
+        sleep 10s
+        upload_status=$(get_upload_status "$app_arn")
+    done
+    echo_details 'Upload successful! Starting run...'
+
+    # Start run
+    local run_params=(--project-arn="$device_farm_project")
+    run_params+=(--device-pool-arn="$device_pool")
+    run_params+=(--app-arn="$app_arn")
+    run_params+=(--test="{\"type\": \"${test_type}\",\"testPackageArn\": \"${test_package_arn}\",\"parameters\": {\"TestEnvVar\": \"foo\"}}")
+    run_params+=(--output=json)
+
+    if [ ! -z "$run_name_prefix" ]; then
+        local run_name="${run_name_prefix}_${platform}_${build_version}"
+        run_params+=(--name="$run_name")
+        echo_details "Using run name '$run_name'"
+    fi
+    local run_response=$(aws devicefarm schedule-run "${run_params[@]}")
+    echo_info "Run started for $platform!"
+    echo_details "Run response: '${run_response}'"
+}
+
 #=======================================
 # Main
 #=======================================
@@ -95,12 +182,11 @@ fi
 echo_details "* device_farm_project: $device_farm_project"
 echo_details "* test_package_name: $test_package_name"
 echo_details "* test_type: $test_type"
+echo_details "* platform: $platform"
 echo_details "* ios_pool: $ios_pool"
+echo_details "* ipa_path: $ipa_path"
 echo_details "* run_name_prefix: $run_name_prefix"
-echo_details "* upload_bucket: $upload_bucket"
-echo_details "* upload_local_path: $upload_local_path"
-echo_details "* acl_control: $acl_control"
-echo_details "* set_acl_only_on_changed_objets: $set_acl_only_on_changed_objets"
+echo_details "* build_version: $build_version"
 echo_details "* aws_region: $aws_region"
 echo
 
@@ -109,101 +195,24 @@ validate_required_input "secret_access_key" $secret_access_key
 validate_required_input "device_farm_project" $device_farm_project
 validate_required_input "test_package_name" $test_package_name
 validate_required_input "test_type" $test_type
-validate_required_input "ios_pool" $ios_pool
-#validate_required_input "upload_bucket" $upload_bucket
-#validate_required_input "upload_local_path" $upload_local_path
 
-####### Set up device farm run ##########
+options=("ios"  "android" "ios+android")
+validate_required_input_with_options "platform" $platform "${options[@]}"
+
 set -o nounset
 set -o errexit
 set -o pipefail
 
-# Get most recent test bundle ARN
-test_package_arn=$(aws devicefarm list-uploads --arn="$device_farm_project" --query="uploads[?name=='${test_package_name}'] | max_by(@, &created).arn" --no-paginate | sed 's/\"//g')
+get_test_package_arn
 
-echo_details "Got test bundle ARN:'${test_package_arn}'"
-
-#TODO upload app bundle and get ARN from that
-app_arn='HARDCODE APP ARN HERE'
-
-#TODO get these from bitrise env
-platform='ios'
-bitrise_build_number='0'
-device_pool="$ios_pool"
-
-run_params=(--project-arn="$device_farm_project")
-run_params+=(--device-pool-arn="$device_pool")
-run_params+=(--app-arn="$app_arn")
-run_params+=(--test="{\"type\": \"${test_type}\",\"testPackageArn\": \"${test_package_arn}\",\"parameters\": {\"TestEnvVar\": \"foo\"}}")
-run_params+=(--query='run.arn')
-
-if [ ! -n "${run_name_prefix}" ]; then
-    run_params+=(--name="${run_name_prefix}_${platform}_${bitrise_build_number}")
-fi
-run_arn=$(aws devicefarm schedule-run "${run_params[@]}" | sed 's/\"//g')
-echo "Got run ARN:'${run_arn}'"
-
-exit 0
-
-####### S3 UPLOAD CODE: #######
-
-options=("public-read"  "private")
-validate_required_input_with_options "acl_control" $acl_control "${options[@]}"
-
-options=("true"  "no")
-validate_required_input_with_options "set_acl_only_on_changed_objets" $set_acl_only_on_changed_objets "${options[@]}"
-
-# this expansion is required for paths with ~
-#  more information: http://stackoverflow.com/questions/3963716/how-to-manually-expand-a-special-variable-ex-tilde-in-bash
-eval expanded_upload_local_path="${upload_local_path}"
-
-if [ ! -n "${upload_bucket}" ]; then
-  echo_fail 'Input upload_bucket is missing'
-  exit 1
+if [ "$platform" == 'ios' ]; then
+    validate_ios_inputs
+    device_farm_run "$ios_pool" "$ipa_path" 'IOS_APP'
+elif [ "$platform" == 'android' ]; then
+    validate_android_inputs
+elif [ "$platform" == 'ios+android' ]; then
+    validate_ios_inputs
+    validate_android_inputs
 fi
 
-if [ ! -e "${expanded_upload_local_path}" ]; then
-  echo_fail "The specified local path doesn't exist at: ${expanded_upload_local_path}"
-  exit 1
-fi
-
-aclcmd='private'
-if [ "${acl_control}" == 'public-read' ]; then
-  echo_details "ACL 'public-read' specified!"
-  aclcmd='public-read'
-fi
-
-if [[ "$aws_region" != "" ]] ; then
-	echo_details "AWS region (${aws_region}) specified!"
-	export AWS_DEFAULT_REGION="${aws_region}"
-fi
-
-s3_url="s3://${upload_bucket}"
-export AWS_ACCESS_KEY_ID="${access_key_id}"
-export AWS_SECRET_ACCESS_KEY="${secret_access_key}"
-
-# do a sync -> delete no longer existing objects
-echo_info "$ aws s3 sync ${expanded_upload_local_path} ${s3_url} --delete --acl ${aclcmd}"
-aws s3 sync "${expanded_upload_local_path}" "${s3_url}" --delete --acl ${aclcmd}
-
-if [[ "${set_acl_only_on_changed_objets}" != "true" ]] ; then
-  echo_details "Setting ACL on every object, this can take some time..."
-  # `sync` only sets the --acl for the modified files, so we'll
-  #  have to query the objects manually, and set the required acl one by one
-  IFS=$'\n'
-  for a_s3_obj_key in $(aws s3api list-objects --bucket "${upload_bucket}" --query Contents[].[Key] --output text)
-  do
-    echo_info "$ aws s3api put-object-acl --acl ${aclcmd} --bucket ${upload_bucket} --key ${a_s3_obj_key}"
-    aws s3api put-object-acl --acl ${aclcmd} --bucket "${upload_bucket}" --key "${a_s3_obj_key}"
-  done
-  unset IFS
-else
-  echo_details "ACL is only changed on objects which were changed by the sync"
-fi
-
-echo_done "Success"
-echo_details "Access Control set to: ${acl_control}"
-if [[ -n ${AWS_DEFAULT_REGION} ]] ; then
-  echo_details "AWS Region: ${aws_region}"
-fi
-echo_details "Base URL: http://${upload_bucket}.s3.amazonaws.com/"
+echo_info 'Done!'

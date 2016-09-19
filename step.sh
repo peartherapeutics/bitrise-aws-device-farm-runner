@@ -110,12 +110,14 @@ function get_upload_status {
 }
 
 function device_farm_run {
-    local device_pool="$1"
-    local app_package_path="$2"
-    local upload_type="$3"
+    local run_platform="$1"
+    local device_pool="$2"
+    local app_package_path="$3"
+    local upload_type="$4"
 
-    echo_info "Setting up device farm run for platform '$upload_type'."
+    echo_info "Setting up device farm run for platform '$run_platform'."
 
+    echo_details "* run_platform: $run_platform"
     echo_details "* device_pool: $device_pool"
     echo_details "* app_package_path: $app_package_path"
     echo_details "* upload_type: $upload_type"
@@ -159,21 +161,21 @@ function device_farm_run {
     run_params+=(--output=json)
 
     if [ ! -z "$run_name_prefix" ]; then
-        local run_name="${run_name_prefix}_${platform}_${build_version}"
+        local run_name="${run_name_prefix}_${run_platform}_${build_version}"
         run_params+=(--name="$run_name")
         echo_details "Using run name '$run_name'"
     fi
     local run_response=$(aws devicefarm schedule-run "${run_params[@]}")
-    echo_info "Run started for $platform!"
+    echo_info "Run started for $run_platform!"
     echo_details "Run response: '${run_response}'"
 }
 
 function device_farm_run_ios {
-    device_farm_run "$ios_pool" "$ipa_path" 'IOS_APP'
+    device_farm_run ios "$ios_pool" "$ipa_path" IOS_APP
 }
 
 function device_farm_run_android {
-    device_farm_run "$android_pool" "$apk_path" 'ANDROID_APP'
+    device_farm_run android "$android_pool" "$apk_path" ANDROID_APP
 }
 
 #=======================================

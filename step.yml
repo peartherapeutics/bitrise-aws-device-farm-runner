@@ -1,27 +1,21 @@
-title: "Amazon S3 Bucket Sync"
-summary: "Amazon S3 Bucket Sync"
+title: "Amazon Device Farm Runner"
+summary: "Amazon Device Farm Runner"
 description: |-
-  Syncs the given local folder with an S3 bucket.
+  Deploys app to device farm and starts a test run with a preconfigured test package and device pool.
 
-  This Step requires an Amazon S3 registration.
-  To register an Amazon S3 account, [click here](http://aws.amazon.com/s3/).
-
-  # Warning!
-
-  It will perform a one-direction sync, removing every file and folder from
-  the bucket which is not present in the local, input folder!
-website: https://github.com/bitrise-io/steps-amazon-s3-upload
-source_code_url: https://github.com/bitrise-io/steps-amazon-s3-upload
-support_url: https://github.com/bitrise-io/steps-amazon-s3-upload/issues
+  This Step requires an Amazon Device Farm registration. To register an account, [click here](https://aws.amazon.com/device-farm/)
+website: https://github.com/peartherapeutics/bitrise-aws-device-farm-runner
+source_code_url: https://github.com/peartherapeutics/bitrise-aws-device-farm-runner
+support_url: https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/issues
 host_os_tags:
+  - linux
   - osx-10.9
   - osx-10.10
 project_type_tags: []
 type_tags:
-  - deploy
-  - upload
-  - uploader
+  - test
   - amazon
+  - device-farm
 is_requires_admin_user: false
 is_always_run: false
 is_skippable: false
@@ -48,7 +42,7 @@ inputs:
     opts:
       title: "Device Farm Project ARN"
       summary: ""
-      description: ""
+      description: "Project ARNs can be obtained using the AWS CLI 'devicefarm list-projects' command."
       is_required: true
   - test_package_name: ""
     opts:
@@ -79,7 +73,7 @@ inputs:
   - ios_pool: ""
     opts:
       title: "Device Farm iOS Device Pool ARN"
-      description: "Required for iOS runs."
+      description: "Required for iOS runs. ARNs can be obtained using the AWS CLI 'devicefarm list-device-pools' command."
   - apk_path: "$BITRISE_SIGNED_APK_PATH"
     opts:
       title: "APK file path"
@@ -87,7 +81,7 @@ inputs:
   - android_pool: ""
     opts:
       title: "Device Farm Android Device Pool ARN"
-      description: "Required for Android runs."
+      description: "Required for Android runs. ARNs can be obtained using the AWS CLI 'devicefarm list-device-pools' command."
   - run_name_prefix: ""
     opts:
       title: "Run Name Prefix"
@@ -105,6 +99,6 @@ inputs:
       title: "AWS Region"
       summary: ""
       description: |
-        If you want to specify a different AWS region of the bucket. Leave
+        If you want to specify a different AWS region. Leave
         empty to use the default config/env setting.
 outputs: []

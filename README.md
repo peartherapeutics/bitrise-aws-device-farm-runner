@@ -1,10 +1,7 @@
-# Amazon S3 Upload
+# Amazon Device Farm Runner
+Deploys app to device farm and starts a test run with a preconfigured test package and device pool.
 
-The new Amazon S3 Upload step.
-
-Syncs the given local folder with an S3 bucket.
-
-This Step requires an Amazon S3 registration. To register an Amazon S3 account, [click here](http://aws.amazon.com/s3/)
+This Step requires an Amazon Device Farm registration. To register an account, [click here](https://aws.amazon.com/device-farm/)
 
 Can be run directly with the [bitrise CLI](https://github.com/bitrise-io/bitrise),
 just `git clone` this repository, `cd` into it's folder in your Terminal/Command Line

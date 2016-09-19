@@ -21,8 +21,9 @@ workflows:
         - device_farm_project: ""
         - test_package_name: "test_bundle.zip"
         - test_type: "APPIUM_PYTHON"
-        - platform: "ios"
+        - platform: "ios+android"
         - ios_pool: ""
+        - android_pool: ""
         - run_name_prefix: "testscript"
         - aws_region: ""
 

@@ -84,12 +84,13 @@ function validate_required_input_with_options {
 }
 
 function validate_ios_inputs {
-    validate_required_input "ios_pool" $ios_pool
     validate_required_input "ipa_path" $ipa_path
+    validate_required_input "ios_pool" $ios_pool
 }
 
 function validate_android_inputs {
-    echo_fail 'android is not yet supported'
+    validate_required_input "apk_path" $apk_path
+    validate_required_input "android_pool" $android_pool
 }
 
 function get_test_package_arn {
@@ -109,12 +110,17 @@ function get_upload_status {
 }
 
 function device_farm_run {
-    echo_info "Setting up device farm run for platform '$platform'."
     local device_pool="$1"
     local app_package_path="$2"
     local upload_type="$3"
 
-    validate_required_input "test_package_arn" $test_package_arn
+    echo_info "Setting up device farm run for platform '$upload_type'."
+
+    echo_details "* device_pool: $device_pool"
+    echo_details "* app_package_path: $app_package_path"
+    echo_details "* upload_type: $upload_type"
+    
+    validate_required_variable "test_package_arn" $test_package_arn
     validate_required_variable "device_pool" $device_pool
     validate_required_variable "app_package_path" $app_package_path
     validate_required_variable "upload_type" $upload_type
@@ -162,6 +168,14 @@ function device_farm_run {
     echo_details "Run response: '${run_response}'"
 }
 
+function device_farm_run_ios {
+    device_farm_run "$ios_pool" "$ipa_path" 'IOS_APP'
+}
+
+function device_farm_run_android {
+    device_farm_run "$android_pool" "$apk_path" 'ANDROID_APP'
+}
+
 #=======================================
 # Main
 #=======================================
@@ -183,8 +197,10 @@ echo_details "* device_farm_project: $device_farm_project"
 echo_details "* test_package_name: $test_package_name"
 echo_details "* test_type: $test_type"
 echo_details "* platform: $platform"
-echo_details "* ios_pool: $ios_pool"
 echo_details "* ipa_path: $ipa_path"
+echo_details "* ios_pool: $ios_pool"
+echo_details "* apk_path: $apk_path"
+echo_details "* android_pool: $android_pool"
 echo_details "* run_name_prefix: $run_name_prefix"
 echo_details "* build_version: $build_version"
 echo_details "* aws_region: $aws_region"
@@ -199,20 +215,26 @@ validate_required_input "test_type" $test_type
 options=("ios"  "android" "ios+android")
 validate_required_input_with_options "platform" $platform "${options[@]}"
 
-set -o nounset
 set -o errexit
 set -o pipefail
 
-get_test_package_arn
-
 if [ "$platform" == 'ios' ]; then
     validate_ios_inputs
-    device_farm_run "$ios_pool" "$ipa_path" 'IOS_APP'
+    set -o nounset
+    get_test_package_arn
+    device_farm_run_ios
 elif [ "$platform" == 'android' ]; then
     validate_android_inputs
+    set -o nounset
+    get_test_package_arn
+    device_farm_run_android
 elif [ "$platform" == 'ios+android' ]; then
     validate_ios_inputs
     validate_android_inputs
+    set -o nounset
+    get_test_package_arn
+    device_farm_run_ios
+    device_farm_run_android
 fi
 
 echo_info 'Done!'

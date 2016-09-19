@@ -75,15 +75,19 @@ inputs:
   - ipa_path: "$BITRISE_IPA_PATH"
     opts:
       title: "IPA file path"
-  - apk_path: "$BITRISE_SIGNED_APK_PATH"
-    opts:
-      title: "APK file path"
+      description: "Required for iOS runs."
   - ios_pool: ""
     opts:
       title: "Device Farm iOS Device Pool ARN"
-      summary: ""
-      description: ""
-      is_required: true
+      description: "Required for iOS runs."
+  - apk_path: "$BITRISE_SIGNED_APK_PATH"
+    opts:
+      title: "APK file path"
+      description: "Required for Android runs."
+  - android_pool: ""
+    opts:
+      title: "Device Farm Android Device Pool ARN"
+      description: "Required for Android runs."
   - run_name_prefix: ""
     opts:
       title: "Run Name Prefix"

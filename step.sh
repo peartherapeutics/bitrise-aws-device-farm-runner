@@ -217,6 +217,14 @@ validate_required_input "test_type" $test_type
 options=("ios"  "android" "ios+android")
 validate_required_input_with_options "platform" $platform "${options[@]}"
 
+if [[ "$aws_region" != "" ]] ; then
+	echo_details "AWS region (${aws_region}) specified!"
+	export AWS_DEFAULT_REGION="${aws_region}"
+fi
+
+export AWS_ACCESS_KEY_ID="${access_key_id}"
+export AWS_SECRET_ACCESS_KEY="${secret_access_key}"
+
 set -o errexit
 set -o pipefail
 

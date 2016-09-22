@@ -95,3 +95,13 @@ workflows:
             bitrise share start -c ${MY_STEPLIB_REPO_FORK_GIT_URL}
             bitrise share create --stepid ${STEP_ID_IN_STEPLIB} --tag ${STEP_GIT_VERION_TAG_TO_SHARE} --git ${STEP_GIT_CLONE_URL}
             bitrise share finish
+
+            # Automatically generate pull request using hub tool if present
+            if hash hub 2>/dev/null; then
+                echo 'Creating PR...'
+                collections_folder="$HOME/.stepman/step_collections"
+                newest_collection=$(ls -1 "$collections_folder" | tail -n 1)
+                cd "${collections_folder}/${newest_collection}/collection"
+                echo -ne "$STEP_ID_IN_STEPLIB $STEP_GIT_VERION_TAG_TO_SHARE\n\n" | cat - PULL_REQUEST_TEMPLATE.md | hub pull-request -b bitrise-io/bitrise-steplib:master -F -
+            fi
+

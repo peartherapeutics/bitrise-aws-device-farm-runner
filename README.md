@@ -30,6 +30,17 @@ envs:
 - A_SECRET_PARAM_TWO: the value for secret two
 ```
 
+## Testing
+- `bitrise run test`
+ - Note: This test requires additional configuration to pass:
+     1. `AWS_ACCESS_KEY` and `AWS_SECRET_KEY` must be set in `.bitrise.secrets.yml`
+     1. An Amazon device farm project must be set up in the target region, and its ARN must be specified in the `device_farm_project` input
+     1. If `platform` input is...
+       1. ... set to `ios`, then `ios_pool` must be set to the ARN of an iOS device pool and `ipa_path` or envvar `BITRISE_IPA_PATH` must be set
+       1. ... set to `android`, then `android_pool` must be set to the ARN of an Android device pool and `apk_path` or envvar `BITRISE_SIGNED_APK_PATH` must be set
+       1. ... set to `ios+android`, then all of the above inputs must be set
+  - see `step.yml` for more info on obtaining ARNs
+
 ## How to create your own step
 
 1. Create a new git repository for your step (**don't fork** the *step template*, create a *new* repository)

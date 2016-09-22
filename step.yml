@@ -22,17 +22,19 @@ is_skippable: false
 deps:
   brew:
   - name: awscli
+    bin_name: aws
   apt_get:
   - name: awscli
+    bin_name: aws
 run_if: ""
 inputs:
-  - access_key_id: ""
+  - access_key_id: "$AWS_ACCESS_KEY"
     opts:
       title: "AWS Access Key"
       summary: ""
       description: ""
       is_required: true
-  - secret_access_key: ""
+  - secret_access_key: "$AWS_SECRET_KEY"
     opts:
       title: "AWS Secret Key"
       summary: ""
@@ -94,7 +96,7 @@ inputs:
       title: "Build Number"
       description: "Build number"
       is_required: true
-  - aws_region: ""
+  - aws_region: "$AWS_REGION"
     opts:
       title: "AWS Region"
       summary: ""

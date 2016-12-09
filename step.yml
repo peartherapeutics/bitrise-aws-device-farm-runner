@@ -4,6 +4,8 @@ description: |-
   Deploys app to device farm and starts a test run with a preconfigured test package and device pool.
 
   This Step requires an Amazon Device Farm registration. To register an account, [click here](https://aws.amazon.com/device-farm/)
+
+  Use the [aws-device-farm-file-deploy](https://github.com/peartherapeutics/bitrise-aws-device-farm-file-deploy) step to upload your latest test package (and extra app data if required) before this step runs.
 website: https://github.com/peartherapeutics/bitrise-aws-device-farm-runner
 source_code_url: https://github.com/peartherapeutics/bitrise-aws-device-farm-runner
 support_url: https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/issues
@@ -50,7 +52,10 @@ inputs:
     opts:
       title: "Test Package Filename"
       summary: ""
-      description: "Filename of test package to run, the latest package with this name will be used."
+      description: |-
+          Filename of test package to run.
+          This should be a filename (not a path) that matches the name of the test bundle previously uploaded with the aws-device-farm-file-deploy step.
+          The most recently uploaded package with this name will be used.
       is_required: true
   - test_type: ""
     opts:

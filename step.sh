@@ -4,6 +4,9 @@ THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 set -e
 
+# Uncomment for easier debugging:
+#set -x
+
 #=======================================
 # Functions
 #=======================================

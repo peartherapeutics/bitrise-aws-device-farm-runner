@@ -112,4 +112,14 @@ inputs:
       description: |
         If you want to specify a different AWS region. Leave
         empty to use the default config/env setting.
-outputs: []
+outputs:
+  - BITRISE_DEVICEFARM_RESULTS_RAW:
+    opts:
+      title: The full output from the device farm run
+      description: |-
+        This is the full results of the run in JSON from AWS Device Farm
+  - BITRISE_DEVICEFARM_RESULTS_SUMMARY:
+    opts:
+      title: A human-readable summary of the results.
+      description: |-
+        A nice summary suitable for feeding into something like a slack message.

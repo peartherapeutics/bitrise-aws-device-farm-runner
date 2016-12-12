@@ -120,6 +120,26 @@ function get_run_result {
     echo "$run_result"
 }
 
+function get_run_final_result {
+	local run_arn="$1"
+	validate_required_variable "run_arn" $run_arn
+
+	local run_final_details=$(aws devicefarm get-run --arn="$run_arn")
+	local run_final_details_minutes=$(echo "${run_final_details}" | jq -r .run.deviceMinutes.total)
+	local run_final_details_completed_jobs=$(echo "${run_final_details}" | jq -r .run.completedJobs)
+	local run_final_details_total_jobs=$(echo "${run_final_details}" | jq -r .run.totalJobs)
+	local run_final_details_summary="Run performed ${run_final_details_completed_jobs}/${run_final_details_total_jobs} jobs. Total time ${run_final_details_minutes} minutes."
+
+  # Output in build log
+  echo_details $run_final_details
+	echo_details $run_final_details_summary
+
+  # Export results to be used in subsequent notification steps
+	envman add --key BITRISE_DEVICEFARM_RESULTS_RAW --value "$run_final_details"
+	envman add --key BITRISE_DEVICEFARM_RESULTS_SUMMARY --value "$run_final_details_summary"
+
+}
+
 function device_farm_run {
     local run_platform="$1"
     local device_pool="$2"
@@ -190,19 +210,24 @@ function device_farm_run {
 		echo_details "Waiting for run to complete. This can take a while..."
 		while [ ! "$run_result" == 'PASSED' ]; do
         if [ "$run_result" == 'FAILED' ]; then
+		  			get_run_final_result "$run_arn"
             echo_fail 'Run failed (result == FAILED)'
         fi
 				if [ "$run_result" == 'SKIPPED' ]; then
+			  		get_run_final_result "$run_arn"
 						echo_fail 'Run failed (result == SKIPPED)'
 				fi
 				if [ "$run_result" == 'ERRORED' ]; then
+			  		get_run_final_result "$run_arn"
 						echo_fail 'Run failed (result == ERRORED)'
 				fi
 				if [ "$run_result" == 'STOPPED' ]; then
+	  				get_run_final_result "$run_arn"
 						echo_fail 'Run failed (result == STOPPED)'
 				fi
 				if [ "$run_result" == 'WARNED' ]; then
 					  # Not sure if a WARNED result counts as a fail or not for us?
+						get_run_final_result "$run_arn"
 						echo_fail 'Run failed (result == WARNED)'
 				fi
 
@@ -213,6 +238,7 @@ function device_farm_run {
 
 		# Run completed successfully. Obtain the full run details.
     echo_details 'Run successful!'
+		get_run_final_result "$run_arn"
 }
 
 function device_farm_run_ios {

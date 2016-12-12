@@ -3,11 +3,18 @@ default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
 app:
   envs:
-  # define these in your .bitrise.secrets.yml
+  # Define all of the following in your .bitrise.secrets.yml file when testing.
+  # An example has been included in .bitrise.secrets.yml.example
   - AWS_ACCESS_KEY: $AWS_ACCESS_KEY
   - AWS_SECRET_KEY: $AWS_SECRET_KEY
-  - BUCKET_NAME: $BUCKET_NAME
-  # - BUCKET_REGION: $BUCKET_REGION
+  - DEVICE_FARM_PROJECT: $DEVICE_FARM_PROJECT
+  - TEST_PACKAGE_NAME: $TEST_PACKAGE_NAME
+  - TEST_TYPE: $TEST_TYPE
+  - PLATFORM: $PLATFORM
+  - IOS_POOL: $IOS_POOL
+  - ANDROID_POOL: $ANDROID_POOL
+  - RUN_NAME_PREFIX: $RUN_NAME_PREFIX
+  - AWS_REGION: $AWS_REGION
 
 workflows:
   # ----------------------------------------------------------------
@@ -18,14 +25,14 @@ workflows:
         inputs:
         - access_key_id: $AWS_ACCESS_KEY
         - secret_access_key: $AWS_SECRET_KEY
-        - device_farm_project: ""
-        - test_package_name: "test_bundle.zip"
-        - test_type: "APPIUM_PYTHON"
-        - platform: "ios+android"
-        - ios_pool: ""
-        - android_pool: ""
-        - run_name_prefix: "testscript"
-        - aws_region: ""
+        - device_farm_project: $DEVICE_FARM_PROJECT
+        - test_package_name: $TEST_PACKAGE_NAME
+        - test_type: $TEST_TYPE
+        - platform: $PLATFORM
+        - ios_pool: $IOS_POOL
+        - android_pool: $ANDROID_POOL
+        - run_name_prefix: $RUN_NAME_PREFIX
+        - aws_region: $AWS_REGION
 
   # ----------------------------------------------------------------
   # --- workflow to Release with auto version bump
@@ -115,4 +122,3 @@ workflows:
                 cd "${collections_folder}/${newest_collection}/collection"
                 echo -ne "$STEP_ID_IN_STEPLIB $STEP_GIT_VERION_TAG_TO_SHARE\n\n" | cat - PULL_REQUEST_TEMPLATE.md | hub pull-request -b bitrise-io/bitrise-steplib:master -F -
             fi
-

@@ -124,7 +124,7 @@ function get_run_final_result {
     local run_arn="$1"
     validate_required_variable "run_arn" "${run_arn}"
 
-    local run_final_details=$(aws devicefarm get-run --arn="$run_arn")
+    local run_final_details=$(aws devicefarm get-run --arn="$run_arn" --output=json)
     local run_final_details_minutes=$(echo "${run_final_details}" | jq -r .run.deviceMinutes.total)
     local run_final_details_completed_jobs=$(echo "${run_final_details}" | jq -r .run.completedJobs)
     local run_final_details_total_jobs=$(echo "${run_final_details}" | jq -r .run.totalJobs)
@@ -196,7 +196,7 @@ function device_farm_run {
         run_params+=(--name="$run_name")
         echo_details "Using run name '$run_name'"
     fi
-    local run_response=$(aws devicefarm schedule-run "${run_params[@]}")
+    local run_response=$(aws devicefarm schedule-run "${run_params[@]}" --output=json)
     echo_info "Run started for $run_platform!"
     echo_details "Run response: '${run_response}'"
 

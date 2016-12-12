@@ -18,72 +18,72 @@ BLUE='\033[00;34m'
 GREEN='\033[00;32m'
 
 function color_echo {
-	color=$1
-	msg=$2
-	echo -e "${color}${msg}${RESTORE}"
+    color=$1
+    msg=$2
+    echo -e "${color}${msg}${RESTORE}"
 }
 
 function echo_fail {
-	msg=$1
-	echo
-	color_echo "${RED}" "${msg}"
-	exit 1
+    msg=$1
+    echo
+    color_echo "${RED}" "${msg}"
+    exit 1
 }
 
 function echo_warn {
-	msg=$1
-	color_echo "${YELLOW}" "${msg}"
+    msg=$1
+    color_echo "${YELLOW}" "${msg}"
 }
 
 function echo_info {
-	msg=$1
-	echo
-	color_echo "${BLUE}" "${msg}"
+    msg=$1
+    echo
+    color_echo "${BLUE}" "${msg}"
 }
 
 function echo_details {
-	msg=$1
-	echo "  ${msg}"
+    msg=$1
+    echo "  ${msg}"
 }
 
 function echo_done {
-	msg=$1
-	color_echo "${GREEN}" "  ${msg}"
+    msg=$1
+    color_echo "${GREEN}" "  ${msg}"
 }
 
 function validate_required_variable {
-	key=$1
-	value=$2
-	if [ -z "${value}" ] ; then
-		echo_fail "[!] Variable: ${key} cannot be empty."
-	fi
+    key=$1
+    value=$2
+    if [ -z "${value}" ] ; then
+        echo_fail "[!] Variable: ${key} cannot be empty."
+    fi
 }
 
 function validate_required_input {
-	key=$1
-	value=$2
-	if [ -z "${value}" ] ; then
-		echo_fail "[!] Missing required input: ${key}"
-	fi
+    key=$1
+    value=$2
+    if [ -z "${value}" ] ; then
+        echo_fail "[!] Missing required input: ${key}"
+    fi
 }
 
 function validate_required_input_with_options {
-	key=$1
-	value=$2
-	options=$3
+    key=$1
+    value=$2
+    options=$3
 
-	validate_required_input "${key}" "${value}"
+    validate_required_input "${key}" "${value}"
 
-	found="0"
-	for option in "${options[@]}" ; do
-		if [ "${option}" == "${value}" ] ; then
-			found="1"
-		fi
-	done
+    found="0"
+    for option in "${options[@]}" ; do
+        if [ "${option}" == "${value}" ] ; then
+            found="1"
+        fi
+    done
 
-	if [ "${found}" == "0" ] ; then
-		echo_fail "Invalid input: (${key}) value: (${value}), valid options: ($( IFS=$", "; echo "${options[*]}" ))"
-	fi
+    if [ "${found}" == "0" ] ; then
+        echo_fail "Invalid input: (${key}) value: (${value}), valid options: ($( IFS=$", "; echo "${options[*]}" ))"
+    fi
 }
 
 function validate_ios_inputs {
@@ -121,22 +121,22 @@ function get_run_result {
 }
 
 function get_run_final_result {
-	local run_arn="$1"
-	validate_required_variable "run_arn" $run_arn
+    local run_arn="$1"
+    validate_required_variable "run_arn" $run_arn
 
-	local run_final_details=$(aws devicefarm get-run --arn="$run_arn")
-	local run_final_details_minutes=$(echo "${run_final_details}" | jq -r .run.deviceMinutes.total)
-	local run_final_details_completed_jobs=$(echo "${run_final_details}" | jq -r .run.completedJobs)
-	local run_final_details_total_jobs=$(echo "${run_final_details}" | jq -r .run.totalJobs)
-	local run_final_details_summary="Run performed ${run_final_details_completed_jobs}/${run_final_details_total_jobs} jobs. Total time ${run_final_details_minutes} minutes."
+    local run_final_details=$(aws devicefarm get-run --arn="$run_arn")
+    local run_final_details_minutes=$(echo "${run_final_details}" | jq -r .run.deviceMinutes.total)
+    local run_final_details_completed_jobs=$(echo "${run_final_details}" | jq -r .run.completedJobs)
+    local run_final_details_total_jobs=$(echo "${run_final_details}" | jq -r .run.totalJobs)
+    local run_final_details_summary="Run performed ${run_final_details_completed_jobs}/${run_final_details_total_jobs} jobs. Total time ${run_final_details_minutes} minutes."
 
-  # Output in build log
-  echo_details $run_final_details
-	echo_details $run_final_details_summary
+    # Output in build log
+    echo_details $run_final_details
+    echo_details $run_final_details_summary
 
-  # Export results to be used in subsequent notification steps
-	envman add --key BITRISE_DEVICEFARM_RESULTS_RAW --value "$run_final_details"
-	envman add --key BITRISE_DEVICEFARM_RESULTS_SUMMARY --value "$run_final_details_summary"
+    # Export results to be used in subsequent notification steps
+    envman add --key BITRISE_DEVICEFARM_RESULTS_RAW --value "$run_final_details"
+    envman add --key BITRISE_DEVICEFARM_RESULTS_SUMMARY --value "$run_final_details_summary"
 
 }
 
@@ -201,44 +201,44 @@ function device_farm_run {
     echo_details "Run response: '${run_response}'"
 
     # Obtain the ARN for the run from the schedule-run request
-		local run_arn=$(echo "${run_response}" | jq -r .run.arn)
+    local run_arn=$(echo "${run_response}" | jq -r .run.arn)
 
-		# Poll for the run result. This can often take a few minutes depending on
-		# how sophisticated the test suite is and how many devices have been
-		# selected. Note that run result is different to run status.
-		local run_result="PENDING"
-		echo_details "Waiting for run to complete. This can take a while..."
-		while [ ! "$run_result" == 'PASSED' ]; do
+    # Poll for the run result. This can often take a few minutes depending on
+    # how sophisticated the test suite is and how many devices have been
+    # selected. Note that run result is different to run status.
+    local run_result="PENDING"
+    echo_details "Waiting for run to complete. This can take a while..."
+    while [ ! "$run_result" == 'PASSED' ]; do
         if [ "$run_result" == 'FAILED' ]; then
-		  			get_run_final_result "$run_arn"
+            get_run_final_result "$run_arn"
             echo_fail 'Run failed (result == FAILED)'
         fi
-				if [ "$run_result" == 'SKIPPED' ]; then
-			  		get_run_final_result "$run_arn"
-						echo_fail 'Run failed (result == SKIPPED)'
-				fi
-				if [ "$run_result" == 'ERRORED' ]; then
-			  		get_run_final_result "$run_arn"
-						echo_fail 'Run failed (result == ERRORED)'
-				fi
-				if [ "$run_result" == 'STOPPED' ]; then
-	  				get_run_final_result "$run_arn"
-						echo_fail 'Run failed (result == STOPPED)'
-				fi
-				if [ "$run_result" == 'WARNED' ]; then
-					  # Not sure if a WARNED result counts as a fail or not for us?
-						get_run_final_result "$run_arn"
-						echo_fail 'Run failed (result == WARNED)'
-				fi
+        if [ "$run_result" == 'SKIPPED' ]; then
+                get_run_final_result "$run_arn"
+                echo_fail 'Run failed (result == SKIPPED)'
+        fi
+        if [ "$run_result" == 'ERRORED' ]; then
+                get_run_final_result "$run_arn"
+                echo_fail 'Run failed (result == ERRORED)'
+        fi
+        if [ "$run_result" == 'STOPPED' ]; then
+                get_run_final_result "$run_arn"
+                echo_fail 'Run failed (result == STOPPED)'
+        fi
+        if [ "$run_result" == 'WARNED' ]; then
+                # Not sure if a WARNED result counts as a fail or not for us?
+                get_run_final_result "$run_arn"
+                echo_fail 'Run failed (result == WARNED)'
+        fi
 
         echo_details "Run not yet completed; waiting. (Status=$run_result)"
         sleep 30s
         run_result=$(get_run_result "$run_arn")
     done
 
-		# Run completed successfully. Obtain the full run details.
+    # Run completed successfully. Obtain the full run details.
     echo_details 'Run successful!'
-		get_run_final_result "$run_arn"
+    get_run_final_result "$run_arn"
 }
 
 function device_farm_run_ios {
@@ -257,14 +257,14 @@ function device_farm_run_android {
 # Validate parameters
 echo_info "Configs:"
 if [[ -n "$access_key_id" ]] ; then
-	echo_details "* access_key_id: ***"
+    echo_details "* access_key_id: ***"
 else
-	echo_details "* access_key_id: [EMPTY]"
+    echo_details "* access_key_id: [EMPTY]"
 fi
 if [[ -n "$secret_access_key" ]] ; then
-	echo_details "* secret_access_key: ***"
+    echo_details "* secret_access_key: ***"
 else
-	echo_details "* secret_access_key: [EMPTY]"
+    echo_details "* secret_access_key: [EMPTY]"
 fi
 echo_details "* device_farm_project: $device_farm_project"
 echo_details "* test_package_name: $test_package_name"
@@ -289,8 +289,8 @@ options=("ios"  "android" "ios+android")
 validate_required_input_with_options "platform" $platform "${options[@]}"
 
 if [[ "$aws_region" != "" ]] ; then
-	echo_details "AWS region (${aws_region}) specified!"
-	export AWS_DEFAULT_REGION="${aws_region}"
+    echo_details "AWS region (${aws_region}) specified!"
+    export AWS_DEFAULT_REGION="${aws_region}"
 fi
 
 export AWS_ACCESS_KEY_ID="${access_key_id}"

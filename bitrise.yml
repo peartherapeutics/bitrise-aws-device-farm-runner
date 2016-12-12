@@ -26,6 +26,8 @@ workflows:
         - android_pool: ""
         - run_name_prefix: "testscript"
         - aws_region: ""
+        - run_wait_for_results: true
+        - run_fail_on_warning: true
 
   # ----------------------------------------------------------------
   # --- workflow to Release with auto version bump
@@ -115,4 +117,3 @@ workflows:
                 cd "${collections_folder}/${newest_collection}/collection"
                 echo -ne "$STEP_ID_IN_STEPLIB $STEP_GIT_VERION_TAG_TO_SHARE\n\n" | cat - PULL_REQUEST_TEMPLATE.md | hub pull-request -b bitrise-io/bitrise-steplib:master -F -
             fi
-

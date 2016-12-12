@@ -200,45 +200,59 @@ function device_farm_run {
     echo_info "Run started for $run_platform!"
     echo_details "Run response: '${run_response}'"
 
-    # Obtain the ARN for the run from the schedule-run request
-    local run_arn=$(echo "${run_response}" | jq -r .run.arn)
+    # Depending on user parameters, we either wait and poll devicefarm for the
+    # test results, or we skip past leaving it up to the user to follow up the
+    # status of the tests.
+    if [ "$run_wait_for_results" == 'true' ]; then
 
-    # Poll for the run result. This can often take a few minutes depending on
-    # how sophisticated the test suite is and how many devices have been
-    # selected. Note that run result is different to run status.
-    local run_result="PENDING"
-    echo_details "Waiting for run to complete. This can take a while..."
-    while [ ! "$run_result" == 'PASSED' ]; do
-        if [ "$run_result" == 'FAILED' ]; then
-            get_run_final_result "$run_arn"
-            echo_fail 'Run failed (result == FAILED)'
-        fi
-        if [ "$run_result" == 'SKIPPED' ]; then
+        # Obtain the ARN for the run from the schedule-run request
+        local run_arn=$(echo "${run_response}" | jq -r .run.arn)
+
+        # Poll for the run result. This can often take a few minutes depending on
+        # how sophisticated the test suite is and how many devices have been
+        # selected. Note that run result is different to run status.
+        local run_result="PENDING"
+        echo_details "Waiting for run to complete. This can take a while..."
+        while [ ! "$run_result" == 'PASSED' ]; do
+            if [ "$run_result" == 'FAILED' ]; then
+                get_run_final_result "$run_arn"
+                echo_fail 'Run failed (result == FAILED)'
+            fi
+            if [ "$run_result" == 'SKIPPED' ]; then
                 get_run_final_result "$run_arn"
                 echo_fail 'Run failed (result == SKIPPED)'
-        fi
-        if [ "$run_result" == 'ERRORED' ]; then
+            fi
+            if [ "$run_result" == 'ERRORED' ]; then
                 get_run_final_result "$run_arn"
                 echo_fail 'Run failed (result == ERRORED)'
-        fi
-        if [ "$run_result" == 'STOPPED' ]; then
+            fi
+            if [ "$run_result" == 'STOPPED' ]; then
                 get_run_final_result "$run_arn"
                 echo_fail 'Run failed (result == STOPPED)'
-        fi
-        if [ "$run_result" == 'WARNED' ]; then
-                # Not sure if a WARNED result counts as a fail or not for us?
-                get_run_final_result "$run_arn"
-                echo_fail 'Run failed (result == WARNED)'
-        fi
+            fi
+            if [ "$run_result" == 'WARNED' ]; then
+                # Not all people will want a WARNED state to count as failed, so
+                # this option has been made configurable.
+                if [ "$run_fail_on_warning" == 'true' ]; then
+                    get_run_final_result "$run_arn"
+                    echo_fail 'Run failed (result == WARNED)'
+                else
+                  echo_details "Run returned WARNED, passing as successful"
+                  break
+                fi
+            fi
 
-        echo_details "Run not yet completed; waiting. (Status=$run_result)"
-        sleep 30s
-        run_result=$(get_run_result "$run_arn")
-    done
+            echo_details "Run not yet completed; waiting. (Status=$run_result)"
+            sleep 30s
+            run_result=$(get_run_result "$run_arn")
+        done
 
-    # Run completed successfully. Obtain the full run details.
-    echo_details 'Run successful!'
-    get_run_final_result "$run_arn"
+        # Run completed successfully. Obtain the full run details.
+        echo_details 'Run successful!'
+        get_run_final_result "$run_arn"
+    else
+      echo_details 'Run submitted to Devicefarm successfully. Please check results.'
+    fi
 }
 
 function device_farm_run_ios {
@@ -277,6 +291,8 @@ echo_details "* android_pool: $android_pool"
 echo_details "* run_name_prefix: $run_name_prefix"
 echo_details "* build_version: $build_version"
 echo_details "* aws_region: $aws_region"
+echo_details "* run_wait_for_results: $run_wait_for_results"
+echo_details "* run_fail_on_warning: $run_fail_on_warning"
 echo
 
 validate_required_input "access_key_id" "${access_key_id}"

@@ -109,6 +109,14 @@ function get_upload_status {
     echo "$upload_status"
 }
 
+function get_run_result {
+    local run_arn="$1"
+    validate_required_variable "run_arn" $run_arn
+
+    local run_result=$(aws devicefarm get-run --arn="$run_arn" --query='run.result' --output=text)
+    echo "$run_result"
+}
+
 function device_farm_run {
     local run_platform="$1"
     local device_pool="$2"
@@ -121,7 +129,7 @@ function device_farm_run {
     echo_details "* device_pool: $device_pool"
     echo_details "* app_package_path: $app_package_path"
     echo_details "* upload_type: $upload_type"
-    
+
     validate_required_variable "test_package_arn" $test_package_arn
     validate_required_variable "device_pool" $device_pool
     validate_required_variable "app_package_path" $app_package_path
@@ -168,6 +176,40 @@ function device_farm_run {
     local run_response=$(aws devicefarm schedule-run "${run_params[@]}")
     echo_info "Run started for $run_platform!"
     echo_details "Run response: '${run_response}'"
+
+    # Obtain the ARN for the run from the schedule-run request
+		local run_arn=$(echo "${run_response}" | jq -r .run.arn)
+
+		# Poll for the run result. This can often take a few minutes depending on
+		# how sophisticated the test suite is and how many devices have been
+		# selected. Note that run result is different to run status.
+		local run_result="PENDING"
+		echo_details "Waiting for run to complete. This can take a while..."
+		while [ ! "$run_result" == 'PASSED' ]; do
+        if [ "$run_result" == 'FAILED' ]; then
+            echo_fail 'Run failed (result == FAILED)'
+        fi
+				if [ "$run_result" == 'SKIPPED' ]; then
+						echo_fail 'Run failed (result == SKIPPED)'
+				fi
+				if [ "$run_result" == 'ERRORED' ]; then
+						echo_fail 'Run failed (result == ERRORED)'
+				fi
+				if [ "$run_result" == 'STOPPED' ]; then
+						echo_fail 'Run failed (result == STOPPED)'
+				fi
+				if [ "$run_result" == 'WARNED' ]; then
+					  # Not sure if a WARNED result counts as a fail or not for us?
+						echo_fail 'Run failed (result == WARNED)'
+				fi
+
+        echo_details "Run not yet completed; waiting. (Status=$run_result)"
+        sleep 30s
+        run_result=$(get_run_result "$run_arn")
+    done
+
+		# Run completed successfully. Obtain the full run details.
+    echo_details 'Run successful!'
 }
 
 function device_farm_run_ios {

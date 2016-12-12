@@ -87,13 +87,13 @@ function validate_required_input_with_options {
 }
 
 function validate_ios_inputs {
-    validate_required_input "ipa_path" $ipa_path
-    validate_required_input "ios_pool" $ios_pool
+    validate_required_input "ipa_path" "${ipa_path}"
+    validate_required_input "ios_pool" "${ios_pool}"
 }
 
 function validate_android_inputs {
-    validate_required_input "apk_path" $apk_path
-    validate_required_input "android_pool" $android_pool
+    validate_required_input "apk_path" "${apk_path}"
+    validate_required_input "android_pool" "${android_pool}"
 }
 
 function get_test_package_arn {
@@ -106,7 +106,7 @@ function get_test_package_arn {
 
 function get_upload_status {
     local upload_arn="$1"
-    validate_required_variable "upload_arn" $upload_arn
+    validate_required_variable "upload_arn" "${upload_arn}"
 
     local upload_status=$(aws devicefarm get-upload --arn="$upload_arn" --query='upload.status' --output=text)
     echo "$upload_status"
@@ -114,7 +114,7 @@ function get_upload_status {
 
 function get_run_result {
     local run_arn="$1"
-    validate_required_variable "run_arn" $run_arn
+    validate_required_variable "run_arn" "${run_arn}"
 
     local run_result=$(aws devicefarm get-run --arn="$run_arn" --query='run.result' --output=text)
     echo "$run_result"
@@ -122,7 +122,7 @@ function get_run_result {
 
 function get_run_final_result {
     local run_arn="$1"
-    validate_required_variable "run_arn" $run_arn
+    validate_required_variable "run_arn" "${run_arn}"
 
     local run_final_details=$(aws devicefarm get-run --arn="$run_arn")
     local run_final_details_minutes=$(echo "${run_final_details}" | jq -r .run.deviceMinutes.total)
@@ -153,10 +153,10 @@ function device_farm_run {
     echo_details "* app_package_path: $app_package_path"
     echo_details "* upload_type: $upload_type"
 
-    validate_required_variable "test_package_arn" $test_package_arn
-    validate_required_variable "device_pool" $device_pool
-    validate_required_variable "app_package_path" $app_package_path
-    validate_required_variable "upload_type" $upload_type
+    validate_required_variable "test_package_arn" "${test_package_arn}"
+    validate_required_variable "device_pool" "${device_pool}"
+    validate_required_variable "app_package_path" "${app_package_path}"
+    validate_required_variable "upload_type" "${upload_type}"
 
     # Intialize upload
     local app_filename=$(basename "$app_package_path")
@@ -279,14 +279,14 @@ echo_details "* build_version: $build_version"
 echo_details "* aws_region: $aws_region"
 echo
 
-validate_required_input "access_key_id" $access_key_id
-validate_required_input "secret_access_key" $secret_access_key
-validate_required_input "device_farm_project" $device_farm_project
-validate_required_input "test_package_name" $test_package_name
-validate_required_input "test_type" $test_type
+validate_required_input "access_key_id" "${access_key_id}"
+validate_required_input "secret_access_key" "${secret_access_key}"
+validate_required_input "device_farm_project" "${device_farm_project}"
+validate_required_input "test_package_name" "${test_package_name}"
+validate_required_input "test_type" "${test_type}"
 
 options=("ios"  "android" "ios+android")
-validate_required_input_with_options "platform" $platform "${options[@]}"
+validate_required_input_with_options "platform" "${platform}" "${options[@]}"
 
 if [[ "$aws_region" != "" ]] ; then
     echo_details "AWS region (${aws_region}) specified!"

@@ -128,7 +128,7 @@ function get_run_final_result {
     local run_final_details_minutes=$(echo "${run_final_details}" | jq -r .run.deviceMinutes.total)
     local run_final_details_completed_jobs=$(echo "${run_final_details}" | jq -r .run.completedJobs)
     local run_final_details_total_jobs=$(echo "${run_final_details}" | jq -r .run.totalJobs)
-    local run_final_details_summary="Run performed ${run_final_details_completed_jobs}/${run_final_details_total_jobs} jobs. Total time ${run_final_details_minutes} minutes."
+    local run_final_details_summary="Devicefarm performed ${run_final_details_completed_jobs}/${run_final_details_total_jobs} jobs. Total time ${run_final_details_minutes} minutes."
 
     # Output in build log
     echo_details "$run_final_details"

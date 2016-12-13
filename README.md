@@ -27,9 +27,23 @@ Step by step:
 An example `.bitrise.secrets.yml` file:
 
 ```
+---
+# These environments should NOT be checked into source control, they are used
+# to populate your tests when running this step locally.
 envs:
-- A_SECRET_PARAM_ONE: the value for secret one
-- A_SECRET_PARAM_TWO: the value for secret two
+ - AWS_ACCESS_KEY: ""
+ - AWS_SECRET_KEY: ""
+ - DEVICE_FARM_PROJECT: ""
+ - TEST_PACKAGE_NAME: "test_bundle.zip"
+ - TEST_TYPE: "APPIUM_PYTHON"
+ - PLATFORM: "ios+android"
+ - IOS_POOL: ""
+ - ANDROID_POOL: ""
+ - RUN_NAME_PREFIX: "testscript"
+ - AWS_REGION: "us-west-2"
+ - BITRISE_IPA_PATH: ""
+ - BITRISE_SIGNED_APK_PATH: ""
+ - BITRISE_BUILD_NUMBER: 0
 ```
 
 ## Testing

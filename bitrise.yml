@@ -33,6 +33,8 @@ workflows:
         - android_pool: $ANDROID_POOL
         - run_name_prefix: $RUN_NAME_PREFIX
         - aws_region: $AWS_REGION
+        - run_wait_for_results: true
+        - run_fail_on_warning: true
 
   # ----------------------------------------------------------------
   # --- workflow to Release with auto version bump

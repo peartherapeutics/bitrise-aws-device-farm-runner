@@ -25,9 +25,13 @@ deps:
   brew:
   - name: awscli
     bin_name: aws
+  - name: jq
+    bin_name: jq
   apt_get:
   - name: awscli
     bin_name: aws
+  - name: jq
+    bin_name: jq
 run_if: ""
 inputs:
   - access_key_id: "$AWS_ACCESS_KEY"
@@ -108,4 +112,29 @@ inputs:
       description: |
         If you want to specify a different AWS region. Leave
         empty to use the default config/env setting.
-outputs: []
+  - run_wait_for_results: "true"
+    opts:
+      title: "Whether or not to wait for the test results from Devicefarm"
+      description: |-
+          If set to true, the script waits for the test run to complete on
+          Devicefarm before returning success/failure. This will slow down your
+          Bitrise runs, however allows you to make decisions in subsequent steps
+          based on success/failure of the tests.
+  - run_fail_on_warning: "true"
+    opts:
+      title: "Fail if the DeviceFarm results return result of WARNED"
+      description: |-
+          Depending on your tests, you may or may not wish to fail the step if
+          DeviceFarm returns a WARNED result. Only takes effect if
+          run_wait_for_results is also enabled.
+outputs:
+  - BITRISE_DEVICEFARM_RESULTS_RAW:
+    opts:
+      title: The full output from the device farm run
+      description: |-
+        This is the full results of the run in JSON from AWS Device Farm
+  - BITRISE_DEVICEFARM_RESULTS_SUMMARY:
+    opts:
+      title: A human-readable summary of the results.
+      description: |-
+        A nice summary suitable for feeding into something like a slack message.

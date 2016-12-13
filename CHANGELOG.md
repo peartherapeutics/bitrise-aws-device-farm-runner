@@ -18,7 +18,7 @@
 
 -----------------
 
-### 0.0.2 (2016 Sept 16)
+### 0.0.2 (2016 Sept 22)
 
 * Incorporate minor project structure patches from Bitrise's viktorbenei
 

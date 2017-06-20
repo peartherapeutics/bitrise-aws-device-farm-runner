@@ -52,6 +52,15 @@ inputs:
       summary: ""
       description: "Project ARNs can be obtained using the AWS CLI 'devicefarm list-projects' command."
       is_required: true
+  - billing_method: "METERED"
+    opts:
+      title: "Billing Method"
+      summary: ""
+      description: "This step specifies the billing methodfor your test run. Use `METERED` for free tier and pay-as-you-go billing, and `UNMETERED` to use pre-paid device slots.(https://docs.aws.amazon.com/devicefarm/latest/developerguide/how-to-purchase-device-slots.html)"
+      value_options:
+          - "METERED"
+          - "UNMETERED"
+      is_required: false
   - test_package_name: ""
     opts:
       title: "Test Package Filename"

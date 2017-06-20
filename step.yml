@@ -129,6 +129,9 @@ inputs:
           Devicefarm before returning success/failure. This will slow down your
           Bitrise runs, however allows you to make decisions in subsequent steps
           based on success/failure of the tests.
+      value_options:
+        - "true"
+        - "false"
   - run_fail_on_warning: "true"
     opts:
       title: "Fail if the DeviceFarm results return result of WARNED"
@@ -136,6 +139,9 @@ inputs:
           Depending on your tests, you may or may not wish to fail the step if
           DeviceFarm returns a WARNED result. Only takes effect if
           run_wait_for_results is also enabled.
+      value_options:
+        - "true"
+        - "false"
 outputs:
   - BITRISE_DEVICEFARM_RESULTS_RAW:
     opts:

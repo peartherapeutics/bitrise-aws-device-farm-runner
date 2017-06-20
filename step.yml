@@ -52,7 +52,7 @@ inputs:
       summary: ""
       description: "Project ARNs can be obtained using the AWS CLI 'devicefarm list-projects' command."
       is_required: true
-  - billingMethod: ""
+  - billing_method: ""
     opts:
       title: "Billing Method"
       summary: ""

@@ -303,6 +303,9 @@ validate_required_input "device_farm_project" "${device_farm_project}"
 validate_required_input "test_package_name" "${test_package_name}"
 validate_required_input "test_type" "${test_type}"
 
+options=("METERED" "UNMETERED")
+validate_required_input_with_options "billing_method" "${billing_method}" "${options[@]}"
+
 options=("ios"  "android" "ios+android")
 validate_required_input_with_options "platform" "${platform}" "${options[@]}"
 

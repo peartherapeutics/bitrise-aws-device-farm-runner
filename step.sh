@@ -97,11 +97,16 @@ function validate_android_inputs {
 }
 
 function get_test_package_arn {
+    local PREVIOUS_SHELL_OPTIONS=$(set +o)
+    set +o errexit
     # Get most recent test bundle ARN
     test_package_arn=$(aws devicefarm list-uploads --arn="$device_farm_project" --query="uploads[?name=='${test_package_name}'] | max_by(@, &created).arn" --no-paginate --output=text)
-    #test_package_arn=''
+    if [[ "$?" -ne 0 ]]; then
+        echo_fail "Unable to find a test package named '${test_package_name}' in your device farm project. Please make sure that test_package_name corresponds to the basename (not the full path) of the test package which should have been previously uploaded by the aws-file-deploy step. See https://github.com/peartherapeutics/bitrise-aws-device-farm-file-deploy"
+    fi
 
     echo_details "Got test package ARN:'${test_package_arn}'"
+    eval "$PREVIOUS_SHELL_OPTIONS"
 }
 
 function get_upload_status {

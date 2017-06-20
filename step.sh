@@ -186,6 +186,7 @@ function device_farm_run {
 
     # Start run
     local run_params=(--project-arn="$device_farm_project")
+    run_params+=(--configuration="$billingMethod")
     run_params+=(--device-pool-arn="$device_pool")
     run_params+=(--app-arn="$app_arn")
     run_params+=(--test="{\"type\": \"${test_type}\",\"testPackageArn\": \"${test_package_arn}\",\"parameters\": {\"TestEnvVar\": \"foo\"}}")

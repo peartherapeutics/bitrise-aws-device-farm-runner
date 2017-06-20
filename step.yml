@@ -57,7 +57,7 @@ inputs:
       title: "Billing Method"
       summary: ""
       description: "use METERED or UNMETERED"
-      is_required: no
+      is_required: false
   - test_package_name: ""
     opts:
       title: "Test Package Filename"

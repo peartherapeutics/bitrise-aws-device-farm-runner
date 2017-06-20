@@ -52,12 +52,6 @@ inputs:
       summary: ""
       description: "Project ARNs can be obtained using the AWS CLI 'devicefarm list-projects' command."
       is_required: true
-  - billingMethod: ""
-    opts: 
-      title: "billingMethod"
-      summary: ""
-      description: "If not defined, then METERED billing method will be used."
-      is_required: false
   - test_package_name: ""
     opts:
       title: "Test Package Filename"

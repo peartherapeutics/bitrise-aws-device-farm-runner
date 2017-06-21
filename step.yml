@@ -1,5 +1,4 @@
 title: "Amazon Device Farm Runner"
-add wiring for setting billing_method from .bitrise.secrets.yml
 summary: "Amazon Device Farm Runner"
 description: |-
   Deploys app to device farm and starts a test run. [Please see the wiki for setup instructions](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/wiki).

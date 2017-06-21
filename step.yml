@@ -12,8 +12,6 @@ host_os_tags:
 project_type_tags: []
 type_tags:
   - test
-  - amazon
-  - device-farm
 is_requires_admin_user: false
 is_always_run: false
 is_skippable: false

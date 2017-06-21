@@ -1,4 +1,4 @@
-## Changelog (Current version: 0.0.4)
+## Changelog (Current version: 0.0.5)
 
 ### 0.0.5 (2017 Jun 20)
 

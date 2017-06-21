@@ -16,6 +16,8 @@ app:
   - ANDROID_POOL: $ANDROID_POOL
   - RUN_NAME_PREFIX: $RUN_NAME_PREFIX
   - AWS_REGION: $AWS_REGION
+  - RUN_WAIT_FOR_RESULTS: $RUN_WAIT_FOR_RESULTS
+  - RUN_FAIL_ON_WARNING: $RUN_FAIL_ON_WARNING
 
 workflows:
   # ----------------------------------------------------------------
@@ -35,8 +37,8 @@ workflows:
         - android_pool: $ANDROID_POOL
         - run_name_prefix: $RUN_NAME_PREFIX
         - aws_region: $AWS_REGION
-        - run_wait_for_results: true
-        - run_fail_on_warning: true
+        - run_wait_for_results: $RUN_WAIT_FOR_RESULTS
+        - run_fail_on_warning: $RUN_FAIL_ON_WARNING
 
   # ----------------------------------------------------------------
   # --- workflow to Release with auto version bump

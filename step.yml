@@ -1,11 +1,8 @@
 title: "Amazon Device Farm Runner"
+add wiring for setting billing_method from .bitrise.secrets.yml
 summary: "Amazon Device Farm Runner"
 description: |-
-  Deploys app to device farm and starts a test run with a preconfigured test package and device pool.
-
-  This Step requires an Amazon Device Farm registration. To register an account, [click here](https://aws.amazon.com/device-farm/)
-
-  Use the [aws-device-farm-file-deploy](https://github.com/peartherapeutics/bitrise-aws-device-farm-file-deploy) step to upload your latest test package (and extra app data if required) before this step runs.
+  Deploys app to device farm and starts a test run. [Please see the wiki for setup instructions](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/wiki).
 website: https://github.com/peartherapeutics/bitrise-aws-device-farm-runner
 source_code_url: https://github.com/peartherapeutics/bitrise-aws-device-farm-runner
 support_url: https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/issues

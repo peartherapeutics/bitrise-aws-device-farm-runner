@@ -1,5 +1,13 @@
 ## Changelog (Current version: 0.0.4)
 
+### 0.0.5 (2017 Jun 20)
+
+* Incorporate patch from andreschab90: [add opportunity for metered/unmetered BillingMethod](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/26)
+* [Make boolean options into drop-downs in step editor](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/29)
+* [Add error message with hint about test_package_name](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/30)
+* [point users to wiki for setup instructions](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/31)
+* [fix up formatting of input descriptions](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/32)
+
 -----------------
 
 ### 0.0.4 (2016 Dec 13)

@@ -32,13 +32,13 @@ inputs:
     opts:
       title: "AWS Access Key"
       summary: ""
-      description: ""
+      description: "Access key for your AWS/IAM user. Define this as a secret environment variable in your workflow."
       is_required: true
   - secret_access_key: "$AWS_SECRET_KEY"
     opts:
       title: "AWS Secret Key"
       summary: ""
-      description: ""
+      description: "Secret key for your AWS/IAM user. Define this as a secret environment variable in your workflow."
       is_required: true
   - device_farm_project: ""
     opts:

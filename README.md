@@ -50,17 +50,6 @@ envs:
  - BITRISE_BUILD_NUMBER: 0
 ```
 
-### Required Permissions
-
-The AWS user needs to have these permissions to operate correctly:
-
-- `devicefarm:CreateUpload`
-- `devicefarm:GetUpload`
-- `devicefarm:GetRun`
-- `devicefarm:GetUpload`
-- `devicefarm:ListUploads`
-- `devicefarm:ScheduleRun`
-
 ## Testing
 - `bitrise run test`
  - Note: This test requires additional configuration to pass:

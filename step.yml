@@ -52,7 +52,7 @@ inputs:
     opts:
       title: "Billing Method"
       summary: ""
-      description: "This step specifies the billing methodfor your test run. Use `METERED` for free tier and pay-as-you-go billing, and `UNMETERED` to use pre-paid device slots.(https://docs.aws.amazon.com/devicefarm/latest/developerguide/how-to-purchase-device-slots.html)"
+      description: "This step specifies the billing methodfor your test run. Use `METERED` for free tier and pay-as-you-go billing, and `UNMETERED` to use [pre-paid device slots](https://docs.aws.amazon.com/devicefarm/latest/developerguide/how-to-purchase-device-slots.html)."
       value_options:
           - "METERED"
           - "UNMETERED"
@@ -70,7 +70,7 @@ inputs:
     opts:
       title: "Test Type"
       summary: ""
-      description: "[See the Test.type documentation](http://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Test.html#devicefarm-Type-Test-type)"
+      description: "[See the Test.type documentation](http://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Test.html#devicefarm-Type-Test-type)."
       is_required: true
   - platform: "ios+android"
     opts:
@@ -119,7 +119,7 @@ inputs:
         empty to use the default config/env setting.
   - run_wait_for_results: "true"
     opts:
-      title: "Whether or not to wait for the test results from Devicefarm"
+      title: "Whether or not to wait for the test results from device farm"
       description: |-
           If set to true, the script waits for the test run to complete on
           Device farm before returning success/failure. This will slow down your
@@ -130,7 +130,7 @@ inputs:
         - "false"
   - run_fail_on_warning: "true"
     opts:
-      title: "Fail if the DeviceFarm results return result of WARNED"
+      title: "Fail if the device farm results return result of WARNED"
       description: |-
           Depending on your tests, you may or may not wish to fail the step if
           Device farm returns a WARNED result. Only takes effect if

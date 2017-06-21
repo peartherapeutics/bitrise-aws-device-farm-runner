@@ -47,7 +47,7 @@ inputs:
     opts:
       title: "Device Farm Project ARN"
       summary: ""
-      description: "Project ARNs can be obtained using the AWS CLI 'devicefarm list-projects' command."
+      description: "Project ARNs can be obtained using the AWS CLI `devicefarm list-projects` command."
       is_required: true
   - billing_method: "METERED"
     opts:
@@ -64,14 +64,14 @@ inputs:
       summary: ""
       description: |-
           Filename of test package to run.
-          This should be a filename (not a path) that matches the name of the test bundle previously uploaded with the aws-device-farm-file-deploy step.
+          This should be a filename (not a path) that matches the name of the test bundle previously uploaded with the [aws-device-farm-file-deploy](https://github.com/peartherapeutics/bitrise-aws-device-farm-file-deploy) step.
           The most recently uploaded package with this name will be used.
       is_required: true
   - test_type: ""
     opts:
       title: "Test Type"
       summary: ""
-      description: "See http://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Test.html#devicefarm-Type-Test-type"
+      description: "[See the Test.type documentation](http://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Test.html#devicefarm-Type-Test-type)"
       is_required: true
   - platform: "ios+android"
     opts:
@@ -90,7 +90,7 @@ inputs:
   - ios_pool: ""
     opts:
       title: "Device Farm iOS Device Pool ARN"
-      description: "Required for iOS runs. ARNs can be obtained using the AWS CLI 'devicefarm list-device-pools' command."
+      description: "Required for iOS runs. ARNs can be obtained using the AWS CLI `devicefarm list-device-pools` command."
   - apk_path: "$BITRISE_SIGNED_APK_PATH"
     opts:
       title: "APK file path"
@@ -98,7 +98,7 @@ inputs:
   - android_pool: ""
     opts:
       title: "Device Farm Android Device Pool ARN"
-      description: "Required for Android runs. ARNs can be obtained using the AWS CLI 'devicefarm list-device-pools' command."
+      description: "Required for Android runs. ARNs can be obtained using the AWS CLI `devicefarm list-device-pools` command."
   - run_name_prefix: ""
     opts:
       title: "Run Name Prefix"
@@ -123,7 +123,7 @@ inputs:
       title: "Whether or not to wait for the test results from Devicefarm"
       description: |-
           If set to true, the script waits for the test run to complete on
-          Devicefarm before returning success/failure. This will slow down your
+          Device farm before returning success/failure. This will slow down your
           Bitrise runs, however allows you to make decisions in subsequent steps
           based on success/failure of the tests.
       value_options:
@@ -134,8 +134,8 @@ inputs:
       title: "Fail if the DeviceFarm results return result of WARNED"
       description: |-
           Depending on your tests, you may or may not wish to fail the step if
-          DeviceFarm returns a WARNED result. Only takes effect if
-          run_wait_for_results is also enabled.
+          Device farm returns a WARNED result. Only takes effect if
+          `run_wait_for_results` is also enabled.
       value_options:
         - "true"
         - "false"

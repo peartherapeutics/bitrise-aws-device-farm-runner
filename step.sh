@@ -289,6 +289,7 @@ fi
 echo_details "* device_farm_project: $device_farm_project"
 echo_details "* test_package_name: $test_package_name"
 echo_details "* test_type: $test_type"
+echo_details "* filter: $filter"
 echo_details "* billing_method: $billing_method"
 echo_details "* platform: $platform"
 echo_details "* ipa_path: $ipa_path"

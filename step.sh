@@ -194,7 +194,7 @@ function device_farm_run {
     run_params+=(--device-pool-arn="$device_pool")
     run_params+=(--configuration="{\"billingMethod\": \"${billing_method}\"}")
     run_params+=(--app-arn="$app_arn")
-    run_params+=(--test="{\"type\": \"${test_type}\",\"testPackageArn\": \"${test_package_arn}\",\"parameters\": {\"TestEnvVar\": \"foo\"}}")
+    run_params+=(--test="{\"type\": \"${test_type}\",\"testPackageArn\": \"${test_package_arn}\",,\"filter\": \"${filter}\"\"parameters\": {\"TestEnvVar\": \"foo\"}}")
     run_params+=(--output=json)
 
     if [ ! -z "$run_name_prefix" ]; then

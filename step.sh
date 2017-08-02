@@ -99,9 +99,10 @@ function validate_android_inputs {
 function get_test_package_arn {
     # Get most recent test bundle ARN
     set +o errexit
-    test_package_arn=$(set -eu; aws devicefarm list-uploads --arn="$device_farm_project" --query="uploads[?name=='${test_package_name}'] | max_by(@, &created).arn" --no-paginate --output=text)
+    validate_required_variable "test_package_name" "${test_package_name}"
+    test_package_arn=$(set -eu; set -o pipefail; aws devicefarm list-uploads --arn="$device_farm_project" --query="uploads[?name=='${test_package_name}'] | max_by(@, &created).arn" --output=json | jq -r .)
     if [[ "$?" -ne 0 ]]; then
-        echo_fail "Unable to find a test package named '${test_package_name}' in your device farm project. Please make sure that test_package_name corresponds to the basename (not the full path) of the test package which should have been previously uploaded by the aws-file-deploy step. See https://github.com/peartherapeutics/bitrise-aws-device-farm-file-deploy"
+        echo_fail "Unable to find a test package named '${test_package_name}' in your device farm project. Please make sure that test_package_name corresponds to the basename (not the full path) of the test package which should have been previously uploaded by the aws-file-deploy step. If the test bundle is too old it may not be found; try re-uploading it. See https://github.com/peartherapeutics/bitrise-aws-device-farm-file-deploy"
     fi
     set -o errexit
 }
@@ -164,12 +165,13 @@ function device_farm_run {
     echo_details "* device_pool: $device_pool"
     echo_details "* app_package_path: $app_package_path"
     echo_details "* upload_type: $upload_type"
+    echo_details "* test_package_arn: $test_package_arn"
 
     validate_required_variable "run_platform" "${run_platform}"
-    validate_required_variable "test_package_arn" "${test_package_arn}"
     validate_required_variable "device_pool" "${device_pool}"
     validate_required_variable "app_package_path" "${app_package_path}"
     validate_required_variable "upload_type" "${upload_type}"
+    validate_required_variable "test_package_arn" "${test_package_arn}"
 
     set -o errexit
     set -o nounset

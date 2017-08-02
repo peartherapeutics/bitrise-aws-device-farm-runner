@@ -211,10 +211,17 @@ function device_farm_run {
     run_params+=(--device-pool-arn="$device_pool")
     run_params+=(--configuration="{\"billingMethod\": \"${billing_method}\"}")
     run_params+=(--app-arn="$app_arn")
-    run_params+=(--test="{\"type\": \"${test_type}\",\"testPackageArn\": \"${test_package_arn}\",,\"filter\": \"${filter}\"\"parameters\": {\"TestEnvVar\": \"foo\"}}")
     run_params+=(--output=json)
 
-    if [ ! -z "$run_name_prefix" ]; then
+    local test_params=''
+    test_params+="{\"type\": \"${test_type}\",\"testPackageArn\": \"${test_package_arn}\""
+    if [[ -n "$filter" ]]; then
+        test_params+=",\"filter\": \"${filter}\""
+    fi
+    test_params+=",\"parameters\": {\"TestEnvVar\": \"foo\"}}"
+    run_params+=(--test="$test_params")
+
+    if [ -n "$run_name_prefix" ]; then
         local run_name="${run_name_prefix}_${run_platform}_${build_version}"
         run_params+=(--name="$run_name")
         echo_details "Using run name '$run_name'"

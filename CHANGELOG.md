@@ -1,4 +1,12 @@
-## Changelog (Current version: 0.0.5)
+## Changelog (Current version: 0.0.6)
+
+### 0.0.6 (2017 Aug 2)
+
+* Incorporate patch from andreschab90: [Add opportunity to filter tests](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/40)
+* [Improve error handling](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/41)
+* [Allow aws-cli to auto-paginate response to test bundle search](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/42)
+
+-----------------
 
 ### 0.0.5 (2017 Jun 20)
 

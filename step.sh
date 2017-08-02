@@ -97,23 +97,21 @@ function validate_android_inputs {
 }
 
 function get_test_package_arn {
-    local PREVIOUS_SHELL_OPTIONS=$(set +o)
-    set +o errexit
     # Get most recent test bundle ARN
-    test_package_arn=$(aws devicefarm list-uploads --arn="$device_farm_project" --query="uploads[?name=='${test_package_name}'] | max_by(@, &created).arn" --no-paginate --output=text)
+    set +o errexit
+    test_package_arn=$(set -eu; aws devicefarm list-uploads --arn="$device_farm_project" --query="uploads[?name=='${test_package_name}'] | max_by(@, &created).arn" --no-paginate --output=text)
     if [[ "$?" -ne 0 ]]; then
         echo_fail "Unable to find a test package named '${test_package_name}' in your device farm project. Please make sure that test_package_name corresponds to the basename (not the full path) of the test package which should have been previously uploaded by the aws-file-deploy step. See https://github.com/peartherapeutics/bitrise-aws-device-farm-file-deploy"
     fi
-
-    echo_details "Got test package ARN:'${test_package_arn}'"
-    eval "$PREVIOUS_SHELL_OPTIONS"
+    set -o errexit
 }
 
 function get_upload_status {
     local upload_arn="$1"
     validate_required_variable "upload_arn" "${upload_arn}"
 
-    local upload_status=$(aws devicefarm get-upload --arn="$upload_arn" --query='upload.status' --output=text)
+    local upload_status
+    upload_status=$(set -eu; aws devicefarm get-upload --arn="$upload_arn" --query='upload.status' --output=text)
     echo "$upload_status"
 }
 
@@ -121,7 +119,8 @@ function get_run_result {
     local run_arn="$1"
     validate_required_variable "run_arn" "${run_arn}"
 
-    local run_result=$(aws devicefarm get-run --arn="$run_arn" --query='run.result' --output=text)
+    local run_result
+    run_result=$(set -eu; aws devicefarm get-run --arn="$run_arn" --query='run.result' --output=text)
     echo "$run_result"
 }
 
@@ -129,11 +128,16 @@ function get_run_final_result {
     local run_arn="$1"
     validate_required_variable "run_arn" "${run_arn}"
 
-    local run_final_details=$(aws devicefarm get-run --arn="$run_arn" --output=json)
-    local run_final_details_minutes=$(echo "${run_final_details}" | jq -r .run.deviceMinutes.total)
-    local run_final_details_completed_jobs=$(echo "${run_final_details}" | jq -r .run.completedJobs)
-    local run_final_details_total_jobs=$(echo "${run_final_details}" | jq -r .run.totalJobs)
-    local run_final_details_summary="Devicefarm performed ${run_final_details_completed_jobs}/${run_final_details_total_jobs} jobs. Total time ${run_final_details_minutes} minutes."
+    local run_final_details
+    run_final_details=$(set -eu; aws devicefarm get-run --arn="$run_arn" --output=json)
+    local run_final_details_minutes
+    run_final_details_minutes=$(set -eu; echo "${run_final_details}" | jq -r .run.deviceMinutes.total)
+    local run_final_details_completed_jobs
+    run_final_details_completed_jobs=$(set -eu; echo "${run_final_details}" | jq -r .run.completedJobs)
+    local run_final_details_total_jobs
+    run_final_details_total_jobs=$(set -eu; echo "${run_final_details}" | jq -r .run.totalJobs)
+    local run_final_details_summary
+    run_final_details_summary="Devicefarm performed ${run_final_details_completed_jobs}/${run_final_details_total_jobs} jobs. Total time ${run_final_details_minutes} minutes."
 
     # Output in build log
     echo_details "$run_final_details"
@@ -151,6 +155,9 @@ function device_farm_run {
     local app_package_path="$3"
     local upload_type="$4"
 
+    set +o errexit
+    set +o nounset
+
     echo_info "Setting up device farm run for platform '$run_platform'."
 
     echo_details "* run_platform: $run_platform"
@@ -158,16 +165,25 @@ function device_farm_run {
     echo_details "* app_package_path: $app_package_path"
     echo_details "* upload_type: $upload_type"
 
+    validate_required_variable "run_platform" "${run_platform}"
     validate_required_variable "test_package_arn" "${test_package_arn}"
     validate_required_variable "device_pool" "${device_pool}"
     validate_required_variable "app_package_path" "${app_package_path}"
     validate_required_variable "upload_type" "${upload_type}"
 
+    set -o errexit
+    set -o nounset
+    set -o pipefail
+
     # Intialize upload
-    local app_filename=$(basename "$app_package_path")
-    local create_upload_response=$(aws devicefarm create-upload --project-arn="$device_farm_project" --name="$app_filename" --type="$upload_type" --query='upload.[arn, url]' --output=text)
-    local app_arn=$(echo $create_upload_response|cut -d' ' -f1)
-    local app_upload_url=$(echo $create_upload_response|cut -d' ' -f2)
+    local app_filename
+    app_filename=$(set -eu; basename "$app_package_path")
+    local create_upload_response
+    create_upload_response=$(set -eu; aws devicefarm create-upload --project-arn="$device_farm_project" --name="$app_filename" --type="$upload_type" --query='upload.[arn, url]' --output=text)
+    local app_arn
+    app_arn=$(set -eu; echo $create_upload_response|cut -d' ' -f1)
+    local app_upload_url
+    app_upload_url=$(set -eu; echo $create_upload_response|cut -d' ' -f2)
     echo_details "Initialized upload of package '$app_filename' for app ARN '$app_arn'"
 
     # Perform upload
@@ -176,7 +192,8 @@ function device_farm_run {
     echo_details "Upload finished. Polling for status."
 
     # Poll for successful upload
-    local upload_status=$(get_upload_status "$app_arn")
+    local upload_status
+    upload_status=$(set -eu; get_upload_status "$app_arn")
     echo_details "Upload status: $upload_status"
     while [ ! "$upload_status" == 'SUCCEEDED' ]; do
         if [ "$upload_status" == 'FAILED' ]; then
@@ -185,7 +202,7 @@ function device_farm_run {
 
         echo_details "Upload not yet processed; waiting. (Status=$upload_status)"
         sleep 10s
-        upload_status=$(get_upload_status "$app_arn")
+        upload_status=$(set -eu; get_upload_status "$app_arn")
     done
     echo_details 'Upload successful! Starting run...'
 
@@ -202,7 +219,9 @@ function device_farm_run {
         run_params+=(--name="$run_name")
         echo_details "Using run name '$run_name'"
     fi
-    local run_response=$(aws devicefarm schedule-run "${run_params[@]}" --output=json)
+
+    local run_response
+    run_response=$(set -eu; aws devicefarm schedule-run "${run_params[@]}" --output=json)
     echo_info "Run started for $run_platform!"
     echo_details "Run response: '${run_response}'"
 
@@ -212,7 +231,8 @@ function device_farm_run {
     if [ "$run_wait_for_results" == 'true' ]; then
 
         # Obtain the ARN for the run from the schedule-run request
-        local run_arn=$(echo "${run_response}" | jq -r .run.arn)
+        local run_arn
+        run_arn=$(set -eu; echo "${run_response}" | jq -r .run.arn)
 
         # Poll for the run result. This can often take a few minutes depending on
         # how sophisticated the test suite is and how many devices have been
@@ -250,7 +270,7 @@ function device_farm_run {
 
             echo_details "Run not yet completed; waiting. (Status=$run_result)"
             sleep 30s
-            run_result=$(get_run_result "$run_arn")
+            run_result=$(set -eu; get_run_result "$run_arn")
         done
 
         # Run completed successfully. Obtain the full run details.

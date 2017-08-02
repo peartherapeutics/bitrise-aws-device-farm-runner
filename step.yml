@@ -50,7 +50,7 @@ inputs:
     opts:
       title: "Billing Method"
       summary: ""
-      description: "This step specifies the billing methodfor your test run. Use `METERED` for free tier and pay-as-you-go billing, and `UNMETERED` to use [pre-paid device slots](https://docs.aws.amazon.com/devicefarm/latest/developerguide/how-to-purchase-device-slots.html)."
+      description: "This step specifies the billing method for your test run. Use `METERED` for free tier and pay-as-you-go billing, and `UNMETERED` to use [pre-paid device slots](https://docs.aws.amazon.com/devicefarm/latest/developerguide/how-to-purchase-device-slots.html)."
       value_options:
           - "METERED"
           - "UNMETERED"
@@ -70,6 +70,12 @@ inputs:
       summary: ""
       description: "[See the Test.type documentation](http://docs.aws.amazon.com/devicefarm/latest/APIReference/API_Test.html#devicefarm-Type-Test-type)."
       is_required: true
+  - filter: ""
+    opts:
+      title: "Test Filter"
+      summary: ""
+      description: "This step adds the opportunity to filter your tests. For example com.android.abc.test1. [See the ScheduleRunTest.filter documentation](https://docs.aws.amazon.com/devicefarm/latest/APIReference/API_ScheduleRunTest.html#devicefarm-Type-ScheduleRunTest-filter)."
+      is_required: false
   - platform: "ios+android"
     opts:
       title: "Platform"

@@ -9,6 +9,7 @@ app:
   - AWS_SECRET_KEY: $AWS_SECRET_KEY
   - DEVICE_FARM_PROJECT: $DEVICE_FARM_PROJECT
   - BILLING_METHOD: $BILLING_METHOD
+  - LOCALE: $LOCALE
   - TEST_PACKAGE_NAME: $TEST_PACKAGE_NAME
   - TEST_TYPE: $TEST_TYPE
   - FILTER: $FILTER
@@ -31,6 +32,7 @@ workflows:
         - secret_access_key: $AWS_SECRET_KEY
         - device_farm_project: $DEVICE_FARM_PROJECT
         - billing_method: $BILLING_METHOD
+        - locale: $LOCALE
         - test_package_name: $TEST_PACKAGE_NAME
         - test_type: $TEST_TYPE
         - filter: $FILTER

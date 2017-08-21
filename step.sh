@@ -211,7 +211,7 @@ function device_farm_run {
     # Start run
     local run_params=(--project-arn="$device_farm_project")
     run_params+=(--device-pool-arn="$device_pool")
-    run_params+=(--configuration="{\"billingMethod\": \"${billing_method}\"}")
+    run_params+=(--configuration="{\"billingMethod\": \"${billing_method}\", \"locale\": \"${locale}\"}")
     run_params+=(--app-arn="$app_arn")
     run_params+=(--output=json)
 
@@ -320,6 +320,7 @@ echo_details "* test_package_name: $test_package_name"
 echo_details "* test_type: $test_type"
 echo_details "* filter: $filter"
 echo_details "* billing_method: $billing_method"
+echo_details "* locale: $locale"
 echo_details "* platform: $platform"
 echo_details "* ipa_path: $ipa_path"
 echo_details "* ios_pool: $ios_pool"
@@ -340,6 +341,9 @@ validate_required_input "test_type" "${test_type}"
 
 options=("METERED" "UNMETERED")
 validate_required_input_with_options "billing_method" "${billing_method}" "${options[@]}"
+
+options=("de" "en")
+validate_required_input_with_options "locale" "${locale}" "${options[@]}"
 
 options=("ios"  "android" "ios+android")
 validate_required_input_with_options "platform" "${platform}" "${options[@]}"

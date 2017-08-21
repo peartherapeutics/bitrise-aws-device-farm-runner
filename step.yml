@@ -56,14 +56,14 @@ inputs:
           - "UNMETERED"
       is_required: false
   - locale: "en"
-          opts:
-            title: "The locale for the devices to use"
-            summary: ""
-            description: "The locale as ISO language code to be used by the test devices"
-            value_options:
-                - "en"
-                - "de"
-            is_required: false
+    opts:
+      title: "The locale for the devices to use"
+      summary: ""
+      description: "The locale as ISO language code to be used by the test devices"
+      value_options:
+          - "en"
+          - "de"
+      is_required: false
   - test_package_name: ""
     opts:
       title: "Test Package Filename"

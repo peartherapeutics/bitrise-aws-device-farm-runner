@@ -1,4 +1,10 @@
-## Changelog (Current version: 0.0.6)
+## Changelog (Current version: 0.0.7)
+
+### 0.0.7 (2017 Aug 22)
+
+* Incorporate patch from crysxd: [Feature/locale support](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/44)
+
+-----------------
 
 ### 0.0.6 (2017 Aug 2)
 

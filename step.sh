@@ -220,7 +220,7 @@ function device_farm_run {
     if [[ -n "$filter" ]]; then
         test_params+=",\"filter\": \"${filter}\""
     fi
-    test_params+=",\"parameters\": {\"TestEnvVar\": \"foo\", \"appium_version\": \"1.7.2\"}}"
+    test_params+=",\"parameters\": {\"TestEnvVar\": \"foo\", \"appium_version\": \"1.7.2\"}, \"testSpecArn\": \"Default TestSpec for Android Appium Java TestNG\"}"
     run_params+=(--test="$test_params")
 
     if [ -n "$run_name_prefix" ]; then

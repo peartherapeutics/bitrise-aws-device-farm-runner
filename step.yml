@@ -137,7 +137,7 @@ inputs:
       is_required: false
   - test_environment: ""
     opts:
-      title: "Device Farm Custom Environment ARN"
+      title: "Device Farm Custom TestSpec ARN"
       summary: ""
       description: "Environment ARNs can be obtained using the AWS CLI `devicefarm list-uploads` command."
       is_required: false

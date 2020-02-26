@@ -220,6 +220,9 @@ function device_farm_run {
     if [[ -n "$filter" ]]; then
         test_params+=",\"filter\": \"${filter}\""
     fi
+    if [[ -n "$test_spec" ]]; then
+        test_params+=",\"testSpecArn\": \"${test_spec}\""
+    fi
     test_params+=",\"parameters\": {\"TestEnvVar\": \"foo\"}}"
     run_params+=(--test="$test_params")
 
@@ -319,6 +322,7 @@ echo_details "* device_farm_project: $device_farm_project"
 echo_details "* test_package_name: $test_package_name"
 echo_details "* test_type: $test_type"
 echo_details "* filter: $filter"
+echo_details "* test_spec: $test_spec"
 echo_details "* billing_method: $billing_method"
 echo_details "* locale: $locale"
 echo_details "* platform: $platform"

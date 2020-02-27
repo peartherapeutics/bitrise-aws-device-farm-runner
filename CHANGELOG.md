@@ -14,6 +14,14 @@
 * [1ef828b] Update step.sh
 * [d4e1e65] Update step.sh
 
+-----------------
+
+### 0.0.7 (2017 Aug 22)
+
+* Incorporate patch from crysxd: [Feature/locale support](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/44)
+
+-----------------
+
 ### 0.0.6 (2017 Aug 2)
 
 * Incorporate patch from andreschab90: [Add opportunity to filter tests](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/40)

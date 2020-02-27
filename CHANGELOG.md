@@ -1,10 +1,18 @@
-## Changelog (Current version: 0.0.7)
-
-### 0.0.7 (2017 Aug 22)
-
-* Incorporate patch from crysxd: [Feature/locale support](https://github.com/peartherapeutics/bitrise-aws-device-farm-runner/pull/44)
+## Changelog (Current version: 0.0.8)
 
 -----------------
+
+### 0.0.8 (2020 Feb 27)
+
+* [4c19ea4] Merge pull request #52 from peartherapeutics/ginmon-master
+* [f6cde3a] Merge pull request #51 from ginmon/master
+* [7463aeb] Update step.sh
+* [6e22e57] Update step.yml
+* [9a22c49] Update step.yml
+* [b0b2397] Update step.yml
+* [099c836] Update step.sh
+* [1ef828b] Update step.sh
+* [d4e1e65] Update step.sh
 
 ### 0.0.6 (2017 Aug 2)
 
@@ -52,4 +60,4 @@
 
 -----------------
 
-Updated: 2016 Dec 13
+Updated: 2020 Feb 27

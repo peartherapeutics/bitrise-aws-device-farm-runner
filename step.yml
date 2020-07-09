@@ -28,18 +28,20 @@ deps:
     bin_name: jq
 run_if: ""
 inputs:
-  - access_key_id: "$AWS_ACCESS_KEY"
+  - access_key_id: ""
     opts:
       title: "AWS Access Key"
       summary: ""
       description: "Access key for your AWS/IAM user. Define this as a secret environment variable in your workflow."
       is_required: true
-  - secret_access_key: "$AWS_SECRET_KEY"
+      is_sensitive: true
+  - secret_access_key: ""
     opts:
       title: "AWS Secret Key"
       summary: ""
       description: "Secret key for your AWS/IAM user. Define this as a secret environment variable in your workflow."
       is_required: true
+      is_sensitive: true
   - device_farm_project: ""
     opts:
       title: "Device Farm Project ARN"
@@ -179,10 +181,11 @@ inputs:
       title: "Build Number"
       description: "Build number"
       is_required: true
-  - aws_region: "$AWS_REGION"
+  - aws_region: ""
     opts:
       title: "AWS Region"
       summary: ""
+      is_sensitive: true
       description: |
         If you want to specify a different AWS region. Leave
         empty to use the default config/env setting.
